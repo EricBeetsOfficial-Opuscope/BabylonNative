@@ -68,6 +68,11 @@ android {
             path 'CMakeLists.txt'
         }
     }
+    packagingOptions {
+        pickFirst 'lib/*/libv8android.so'
+        pickFirst 'lib/*/libarcore_sdk_c.so'
+        pickFirst 'lib/*/libarcore_sdk_jni.so'
+    }
 }
 
 dependencies {
