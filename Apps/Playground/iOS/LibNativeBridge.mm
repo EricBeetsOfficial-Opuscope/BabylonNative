@@ -6,8 +6,10 @@
 #import <Babylon/Plugins/NativeEngine.h>
 #import <Babylon/Plugins/NativeXr.h>
 #import <Babylon/Plugins/NativeCamera.h>
+#import <Babylon/Plugins/NativeOptimizations.h>
 #import <Babylon/Polyfills/Window.h>
 #import <Babylon/Polyfills/XMLHttpRequest.h>
+#import <Babylon/Polyfills/Canvas.h>
 #import <Shared/InputManager.h>
 
 #import <optional>
@@ -56,7 +58,11 @@ bool g_isXrActive{};
 
         Babylon::Polyfills::XMLHttpRequest::Initialize(env);
 
+        Babylon::Polyfills::Canvas::Initialize(env);
+
         Babylon::Plugins::NativeEngine::Initialize(env);
+
+        Babylon::Plugins::NativeOptimizations::Initialize(env);
 
         // Initialize NativeXr plugin.
         g_nativeXr.emplace(Babylon::Plugins::NativeXr::Initialize(env));

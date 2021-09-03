@@ -14,12 +14,14 @@
 #include <Babylon/ScriptLoader.h>
 #include <Babylon/Plugins/NativeCapture.h>
 #include <Babylon/Plugins/NativeEngine.h>
+#include <Babylon/Plugins/NativeOptimizations.h>
 #include <Babylon/Plugins/ChromeDevTools.h>
 #include <Babylon/Plugins/NativeXr.h>
 #include <Babylon/Plugins/NativeCamera.h>
 #include <Babylon/Polyfills/Console.h>
 #include <Babylon/Polyfills/Window.h>
 #include <Babylon/Polyfills/XMLHttpRequest.h>
+#include <Babylon/Polyfills/Canvas.h>
 
 #define MAX_LOADSTRING 100
 
@@ -93,7 +95,7 @@ namespace
         Uninitialize();
 
         RECT rect;
-        if (!GetWindowRect(hWnd, &rect))
+        if (!GetClientRect(hWnd, &rect))
         {
             return;
         }
@@ -122,8 +124,11 @@ namespace
             Babylon::Polyfills::Window::Initialize(env);
 
             Babylon::Polyfills::XMLHttpRequest::Initialize(env);
+            Babylon::Polyfills::Canvas::Initialize(env);
 
             Babylon::Plugins::NativeEngine::Initialize(env);
+
+            Babylon::Plugins::NativeOptimizations::Initialize(env);
 
             Babylon::Plugins::NativeCapture::Initialize(env);
 
@@ -145,7 +150,8 @@ namespace
         Babylon::ScriptLoader loader{*runtime};
         loader.Eval("document = {}", "");
         loader.LoadScript("app:///Scripts/ammo.js");
-        loader.LoadScript("app:///Scripts/recast.js");
+        // Commenting out recast.js for now because v8jsi is incompatible with asm.js.
+        // loader.LoadScript("app:///Scripts/recast.js");
         loader.LoadScript("app:///Scripts/babylon.max.js");
         loader.LoadScript("app:///Scripts/babylonjs.loaders.js");
         loader.LoadScript("app:///Scripts/babylonjs.materials.js");
@@ -315,13 +321,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
             else if ((wParam & 0xFFF0) == SC_RESTORE)
             {
-                minimized = false;
-
-                runtime->Resume();
-
-                if (graphics)
+                if (minimized)
                 {
-                    graphics->StartRenderingCurrentFrame();
+                    runtime->Resume();
+
+                    minimized = false;
+
+                    if (graphics)
+                    {
+                        graphics->StartRenderingCurrentFrame();
+                    }
                 }
             }
             DefWindowProc(hWnd, message, wParam, lParam);

@@ -3,10 +3,12 @@
 #include <Babylon/Graphics.h>
 #include <Babylon/ScriptLoader.h>
 #include <Babylon/Plugins/NativeEngine.h>
+#include <Babylon/Plugins/NativeOptimizations.h>
 #include <Babylon/Plugins/NativeXr.h>
 #include <Babylon/Polyfills/Console.h>
 #include <Babylon/Polyfills/Window.h>
 #include <Babylon/Polyfills/XMLHttpRequest.h>
+#include <Babylon/Polyfills/Canvas.h>
 
 #include <pplawait.h>
 #include <winrt/Windows.ApplicationModel.h>
@@ -123,6 +125,7 @@ void App::Uninitialize()
         m_graphics->FinishRenderingCurrentFrame();
     }
 
+    m_chromeDevTools.reset();
     m_inputBuffer.reset();
     m_runtime.reset();
     m_graphics.reset();
@@ -285,15 +288,26 @@ void App::RestartRuntime(Windows::Foundation::Rect bounds)
 
         Babylon::Plugins::NativeEngine::Initialize(env);
 
+        Babylon::Plugins::NativeOptimizations::Initialize(env);
+
+        Babylon::Polyfills::Canvas::Initialize(env);
+
         Babylon::Plugins::NativeXr::Initialize(env);
 
         InputManager<Babylon::AppRuntime>::Initialize(env, *m_inputBuffer);
+
+        m_chromeDevTools = std::make_unique<Babylon::Plugins::ChromeDevTools>(Babylon::Plugins::ChromeDevTools::Initialize(env));
+        if (m_chromeDevTools->SupportsInspector())
+        {
+            m_chromeDevTools->StartInspector(5643, "BabylonNative Playground");
+        }
     });
 
     Babylon::ScriptLoader loader{*m_runtime};
     loader.Eval("document = {}", "");
     loader.LoadScript("app:///Scripts/ammo.js");
-    loader.LoadScript("app:///Scripts/recast.js");
+    // Commenting out recast.js for now as v8jsi is incompatible with asm.js.
+    // loader.LoadScript("app:///Scripts/recast.js");
     loader.LoadScript("app:///Scripts/babylon.max.js");
     loader.LoadScript("app:///Scripts/babylonjs.loaders.js");
     loader.LoadScript("app:///Scripts/babylonjs.materials.js");

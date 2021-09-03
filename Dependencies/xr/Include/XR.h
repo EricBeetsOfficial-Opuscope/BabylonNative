@@ -301,6 +301,8 @@ namespace xr
                 std::vector<InputSource>& InputSources;
                 std::vector<FeaturePoint>& FeaturePointCloud;
 
+                std::optional<Space>& EyeTrackerSpace;
+
                 std::vector<SceneObject::Identifier>UpdatedSceneObjects;
                 std::vector<SceneObject::Identifier>RemovedSceneObjects;
                 std::vector<Plane::Identifier>UpdatedPlanes;
@@ -315,6 +317,7 @@ namespace xr
 
                 void GetHitTestResults(std::vector<HitResult>&, Ray, HitTestTrackableType) const;
                 Anchor CreateAnchor(Pose, NativeAnchorPtr) const;
+                Anchor DeclareAnchor(NativeAnchorPtr) const;
                 void UpdateAnchor(Anchor&) const;
                 void DeleteAnchor(Anchor&) const;
                 SceneObject& GetSceneObjectByID(SceneObject::Identifier) const;
