@@ -166,6 +166,8 @@ configurations
 }
 
 dependencies {
+
+    implementation 'com.android.support.constraint:constraint-layout:2.0.4'
     jscAndroid 'org.webkit:android-jsc:+'
     v8Android 'org.chromium:v8-android:+'
 }
