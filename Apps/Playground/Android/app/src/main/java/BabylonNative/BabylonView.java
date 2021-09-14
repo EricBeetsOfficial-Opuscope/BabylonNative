@@ -139,12 +139,12 @@ public class BabylonView extends FrameLayout implements SurfaceHolder.Callback2,
         }
         return true;
     }
-
+/*
     @Override
     protected void finalize() throws Throwable {
         BabylonNative.Wrapper.finishEngine();
     }
-
+*/
     /**
      * This method is part of the SurfaceHolder.Callback2 interface, and is
      * not normally called or subclassed by clients of BabylonView.

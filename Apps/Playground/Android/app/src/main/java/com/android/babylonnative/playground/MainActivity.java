@@ -21,4 +21,9 @@ public class MainActivity extends Activity {
             }
         });
     }
+    
+    @Override
+    protected void finalize() throws Throwable {
+        BabylonNative.Wrapper.finishEngine();
+    }
 }

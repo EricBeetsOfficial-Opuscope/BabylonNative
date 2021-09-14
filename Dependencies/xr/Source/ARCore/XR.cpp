@@ -339,7 +339,15 @@ namespace xr
             shouldRestartSession = false;
 
             // Update the ArSession to get a new frame
-            ArSession_update(xrContext->Session, xrContext->Frame);
+            {
+                EGLDisplay previousDisplay{ eglGetDisplay(EGL_DEFAULT_DISPLAY) };
+                EGLSurface previousDrawSurface{ eglGetCurrentSurface(EGL_DRAW) };
+                EGLSurface previousReadSurface{ eglGetCurrentSurface(EGL_READ) };
+                EGLContext previousContext{ eglGetCurrentContext() };
+                eglMakeCurrent(eglGetDisplay(EGL_DEFAULT_DISPLAY), EGL_NO_SURFACE, EGL_NO_SURFACE, previousContext);
+                ArSession_update(xrContext->Session, xrContext->Frame);
+                eglMakeCurrent(previousDisplay, previousDrawSurface, previousReadSurface, previousContext);
+            }
 
             ArCamera* camera{};
             ArFrame_acquireCamera(xrContext->Session, xrContext->Frame, &camera);
